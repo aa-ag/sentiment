@@ -5,6 +5,7 @@ from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.corpus import stopwords
 import re
 import string
+from nltk import FreqDist
 
 
 ###--- GLOBAL VARIABLES ---###
@@ -59,4 +60,28 @@ def remove_noise(tweet_tokens, stop_words=()):
 
 stop_words = stopwords.words('english')
 
-print(remove_noise(tweet_tokens[0], stop_words))
+# print(remove_noise(tweet_tokens[0], stop_words))
+
+positive_tweet_tokens = twitter_samples.tokenized('positive_tweets.json')
+negative_tweet_tokens = twitter_samples.tokenized('negative_tweets.json')
+
+positive_cleaned_tokens_list = []
+negative_cleaned_tokens_list = []
+
+for tokens in positive_tweet_tokens:
+    positive_cleaned_tokens_list.append(remove_noise(tokens, stop_words))
+
+for tokens in negative_tweet_tokens:
+    negative_cleaned_tokens_list.append(remove_noise(tokens, stop_words))
+
+
+def get_all_words(cleaned_tokens_list):
+    for tokens in cleaned_tokens_list:
+        for token in tokens:
+            yield token
+
+
+all_pos_words = get_all_words(positive_cleaned_tokens_list)
+
+freq_dist_pos = FreqDist(all_pos_words)
+print(freq_dist_pos.most_common(10))
